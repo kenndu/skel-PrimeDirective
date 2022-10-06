@@ -1,12 +1,16 @@
 package primedirective;
 
+import java.sql.Array;
 import java.util.ArrayList;
 import java.util.List;
+
+import primedirective.Primes;
 
 public class PrimeFactorSequence {
     private List<Integer> primes;
     private int upperBound;
 
+    private List<Integer> numbers = new ArrayList<>();
     /**
      * Create a PrimeFactorSequence object with a defined upperbound.
      *
@@ -16,6 +20,9 @@ public class PrimeFactorSequence {
     public PrimeFactorSequence(int _upperBound) {
         upperBound = _upperBound;
         primes = Primes.getPrimes(upperBound);
+        for (int i = 0; i <= _upperBound; i++) {
+            numbers.add(i);
+        }
     }
 
     /**
@@ -27,8 +34,30 @@ public class PrimeFactorSequence {
      */
     public List<Integer> primeFactorSequence() {
         List<Integer> seq = new ArrayList<>();
-        // TODO: Implement this method
+        for (int num : numbers) {
+            seq.add(primeFactorCount(num));
+        }
         return seq;
+    }
+
+    private int primeFactorCount(int n) {
+        if (n <= 1) {
+            return 0;
+        }
+        if (primes.contains(n)) {
+            return 1;
+        }
+
+        int nextNumber = 0;
+
+        for (int i = 0; i < primes.size(); i++) {
+            if (n % primes.get(i) == 0) {
+                nextNumber = n / primes.get(i);
+                break;
+
+            }
+        }
+        return 1 + primeFactorCount(nextNumber);
     }
 
     /**
@@ -41,7 +70,13 @@ public class PrimeFactorSequence {
      */
     public List<Integer> numbersWithMPrimeFactors(int m) {
         List<Integer> seq = new ArrayList<>();
-        // TODO: Implement this method
+        List<Integer> pfs = primeFactorSequence();
+
+        for (int i = 0; i < pfs.size(); i++) {
+            if (pfs.get(i) == m) {
+                seq.add(i);
+            }
+        }
         return seq;
     }
 
@@ -59,7 +94,15 @@ public class PrimeFactorSequence {
      */
     public List<IntPair> numbersWithMPrimeFactorsAndSmallGap(int m, int gap) {
         List<IntPair> listOfPairs = new ArrayList<>();
-        // TODO: Implement this method
+        List<Integer> primeFactorCounts = numbersWithMPrimeFactors(m);
+
+        for (int i = 0; i < primeFactorCounts.size()-1; i++) {
+            if ((primeFactorCounts.get(i+1) - primeFactorCounts.get(i)) <= gap) {
+                IntPair newPair = new IntPair(primeFactorCounts.get(i), primeFactorCounts.get(i+1));
+                listOfPairs.add(newPair);
+            }
+        }
+
         return listOfPairs;
     }
 
@@ -76,8 +119,48 @@ public class PrimeFactorSequence {
      * @return a string representation of the smallest transformation sequence
      */
     public String changeToPrime(int n) {
-        // TODO: Implement this method
-        return "-";
+        List<String> pathsToPrime = new ArrayList<>();
+
+        StringBuilder path = getPath(n);
+
+        if (primes.contains(n)) {
+            return "";
+        }
+
+        if (path.indexOf("-") == -1) {
+            return "-";
+        }
+
+        return path.toString();
+    }
+
+    private StringBuilder getPath(int n) {
+
+        StringBuilder path = new StringBuilder();
+
+        if (primes.contains(n)) {
+            return new StringBuilder();
+        }
+        if (n > primes.get(primes.size()-1)) {
+            return new StringBuilder("-");
+        }
+
+        if (path.append("0").append(getPath(n+1)).length() < path.append("1").append(getPath(2*n+1)).length()) {
+            return path.append("0").append(getPath(n+1));
+        } else {
+            return path.append("1").append(getPath(2*n+1));
+        }
+
+    }
+
+    private int binaryToDecimal(String binary) {
+        int decimal = 0;
+        char[] binArray = binary.toCharArray();
+        for (int i = binArray.length-1; i >= 0; i--) {
+            decimal += binArray[i]*Math.pow(2,i);
+        }
+
+        return decimal;
     }
 
 }
