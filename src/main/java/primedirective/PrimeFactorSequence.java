@@ -127,7 +127,7 @@ public class PrimeFactorSequence {
             return "";
         }
 
-        if (path.indexOf("-") == -1) {
+        if (path.indexOf("-") != -1) {
             return "-";
         }
 
@@ -144,11 +144,12 @@ public class PrimeFactorSequence {
         if (n > primes.get(primes.size()-1)) {
             return new StringBuilder("-");
         }
-
-        if (path.append("0").append(getPath(n+1)).length() < path.append("1").append(getPath(2*n+1)).length()) {
-            return path.append("0").append(getPath(n+1));
+        if (!primes.contains(n+1) && !primes.contains(2*n+1)) {
+            return path.append("0").append(getPath(2*n+1));
+        } else if (primes.contains(n+1)) {
+            return new StringBuilder("1");
         } else {
-            return path.append("1").append(getPath(2*n+1));
+            return new StringBuilder("0");
         }
 
     }
